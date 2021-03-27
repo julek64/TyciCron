@@ -50,3 +50,8 @@ TaskNode* get_tasks(char* path)
     fclose(file);
     return first;
 }
+
+int time_to_minutes(struct TaskTime* time)
+{
+    return (time->hour * 60) + time->minute;
+}
