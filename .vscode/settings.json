@@ -1,0 +1,12 @@
+{
+    "files.associations": {
+        "stdlib.h": "c"
+    },
+    "makefile.launchConfigurations": [
+        {
+            "cwd": "/home/ubuntu/repos/TyciCron/bin",
+            "binaryPath": "/home/ubuntu/repos/TyciCron/bin/main",
+            "binaryArgs": []
+        }
+    ]
+}
