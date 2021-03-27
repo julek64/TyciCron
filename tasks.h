@@ -1,5 +1,6 @@
 #ifndef TASKS_H
 #define TASKS_H
+
 struct TaskTime
 {
     int hour;
@@ -8,8 +9,10 @@ struct TaskTime
 
 struct Task
 {
-    TaskTime time;
+    struct TaskTime time;
     char* command;
     char info;
 };
+
+struct Task string_to_task(char* string);
 #endif
