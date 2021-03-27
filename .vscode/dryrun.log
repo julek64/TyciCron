@@ -1,7 +1,0 @@
-make all -f /home/ubuntu/repos/TyciCron/Makefile --dry-run --keep-going --print-directory
-make: Entering directory '/home/ubuntu/repos/TyciCron'
-gcc -g -o ./bin/main.o -c main.c
-gcc -g -o ./bin/tasks.o -c tasks.c
-gcc -g -o ./bin/main ./bin/main.o ./bin/tasks.o
-make: Leaving directory '/home/ubuntu/repos/TyciCron'
- 
