@@ -5,4 +5,11 @@ struct taskTime
     int hour;
     int minute;
 };
+
+struct task
+{
+    taskTime time;
+    char* command;
+    char info;
+};
 #endif
