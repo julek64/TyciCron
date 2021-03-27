@@ -1,6 +1,7 @@
 {
     "files.associations": {
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "tasks.h": "c"
     },
     "makefile.launchConfigurations": [
         {
