@@ -9,10 +9,17 @@ struct TaskTime
 
 struct Task
 {
-    struct TaskTime time;
+    struct TaskTime* time;
     char* command;
     char info;
 };
 
-struct Task string_to_task(char* string);
+typedef struct TaskListNode
+{
+    struct Task* task;
+    struct TaskListNode* next;
+} TaskNode;
+
+struct Task* string_to_task(char string[]);
+TaskNode* get_tasks(char* path);
 #endif

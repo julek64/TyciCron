@@ -1,8 +1,17 @@
 #include "tasks.h"
+#include <stdlib.h>
 
 int main(int argc, char* argv)
 {
-    char str[] ="12:45:test ets stdf:1";
-    struct Task task = string_to_task(str);
+    TaskNode* tasks = get_tasks("input.txt");
+    while(tasks != NULL)
+    {
+        printf("%d:%d - %s - %d\n",
+        tasks->task->time->hour,
+        tasks->task->time->minute,
+        tasks->task->command,
+        tasks->task->info);
+        tasks = tasks->next;
+    }
     return 0;
 }
