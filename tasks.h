@@ -1,14 +1,14 @@
 #ifndef TASKS_H
 #define TASKS_H
-struct taskTime
+struct TaskTime
 {
     int hour;
     int minute;
 };
 
-struct task
+struct Task
 {
-    taskTime time;
+    TaskTime time;
     char* command;
     char info;
 };
