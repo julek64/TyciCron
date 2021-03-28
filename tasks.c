@@ -74,3 +74,8 @@ int get_tasktime_seconds(struct TaskTime t)
 {
     return t.hour * 3600 + t.minute * 60;
 }
+
+void run_task(struct Task task)
+{
+    printf("Runnig task: %s\n", task.command);
+}
