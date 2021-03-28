@@ -12,10 +12,10 @@ TARGET = main
 
 all: $(TARGET)
 
-$(TARGET): $(TARGET).o tasks.o merge_sort.o
-	$(CC) $(CFLAGS) -o ./$(DIR)/$(TARGET) ./$(DIR)/$(TARGET).o ./$(DIR)/tasks.o ./$(DIR)/merge_sort.o
+$(TARGET): $(TARGET).o tasks.o merge_sort.o signal_handling.o
+	$(CC) $(CFLAGS) -o ./$(DIR)/$(TARGET) ./$(DIR)/$(TARGET).o ./$(DIR)/tasks.o ./$(DIR)/merge_sort.o ./$(DIR)/signal_handling.o
 
-$(TARGET).o : $(TARGET).c tasks.h merge_sort.h
+$(TARGET).o : $(TARGET).c tasks.h merge_sort.h signal_handling.h
 	$(CC) $(CFLAGS) -o ./$(DIR)/$(TARGET).o -c $(TARGET).c
 
 tasks.o : tasks.c tasks.h
@@ -23,6 +23,9 @@ tasks.o : tasks.c tasks.h
 
 merge_sort.o : merge_sort.c merge_sort.h
 	$(CC) $(CFLAGS) -o ./$(DIR)/merge_sort.o -c merge_sort.c
+
+signal_handling.o : signal_handling.c signal_handling.h
+	$(CC) $(CFLAGS) -o ./$(DIR)/signal_handling.o -c signal_handling.c
 
 
 clean:

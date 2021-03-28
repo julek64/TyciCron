@@ -1,11 +1,16 @@
 #include "tasks.h"
 #include "merge_sort.h"
+#include "signal_handling.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <sys/types.h>
 
 int main(int argc, char* argv)
 {
+    sig_catch();
+    int pid = getpid();
+    printf("\npid: %d\n", pid);
     TaskNode* tasks = get_tasks("input.txt");
     TaskNode* current;
     int remainingTime;
