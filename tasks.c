@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <time.h>
 
 struct Task* string_to_task(char string[])
 {
@@ -54,4 +55,22 @@ TaskNode* get_tasks(char* path)
 int time_to_minutes(struct TaskTime* time)
 {
     return (time->hour * 60) + time->minute;
+}
+
+int get_remaining_time(struct TaskTime* TaskTime)
+{
+    time_t now = time(0);
+    struct tm local;
+    int localSeconds;
+    int remainingSeconds;
+    localtime_r(&now, &local);
+
+    localSeconds = local.tm_hour * 3600 + local.tm_min * 60 + local.tm_sec;
+    remainingSeconds = get_tasktime_seconds(*TaskTime) - localSeconds;
+    return remainingSeconds;
+}
+
+int get_tasktime_seconds(struct TaskTime t)
+{
+    return t.hour * 3600 + t.minute * 60;
 }

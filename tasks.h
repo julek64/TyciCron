@@ -23,4 +23,6 @@ typedef struct TaskListNode
 struct Task* string_to_task(char string[]);
 TaskNode* get_tasks(char* path);
 int time_to_minutes(struct TaskTime* time);
+int get_remaining_time(struct TaskTime* TaskTime);
+int get_tasktime_seconds(struct TaskTime);
 #endif

@@ -13,7 +13,9 @@ int main(int argc, char* argv)
         tasks->task->time->minute,
         tasks->task->command,
         tasks->task->info);
+        printf("remaining sec: %d \n", get_remaining_time(tasks->task->time));
         tasks = tasks->next;
     }
+    
     return 0;
 }
