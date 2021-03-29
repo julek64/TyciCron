@@ -77,7 +77,7 @@ int get_tasktime_seconds(struct TaskTime t)
     return t.hour * 3600 + t.minute * 60;
 }
 
-char* get_program_and_args(char* command)
+char** get_program_and_args(char* command)
 {
     int len = 0;
     for(int i = 0; i < strlen(command); i++)
@@ -92,13 +92,14 @@ char* get_program_and_args(char* command)
     int i = 0;
     while(str != NULL)
     {
-        *args[i] = malloc((strlen(str) + 1) * (sizeof(char)));
-        *args[i] = str;
+        args[i] = malloc((strlen(str) + 1) * (sizeof(char)));
+        strcpy(args[i], str);
         str = strtok(NULL, " ");
+        fflush(stdout);
         i++;
     }
-    *args[i] = malloc(sizeof(char));
-    *args[i] = NULL;
+    args[i] = malloc(sizeof(char));
+    args[i] = NULL;
     return args;
 }
 
@@ -106,13 +107,25 @@ void run_task(struct Task task)
 {
     printf("Runnig task: %s\n", task.command);
     //int outputFile = open("output.txt", O_WRONLY, O_CREAT);
-    char* programAndArgs = get_program_and_args(task.command);
-    char* program = programAndArgs[0];
-    int lenProgramAndArgs = strlen(programAndArgs);
-    char* args[lenProgramAndArgs];
-    for(int i = 1; i < lenProgramAndArgs; i++)
+    char** programAndArgs = get_program_and_args(task.command);
+    char* program;
+    int i;
+    int lenProgramAndArgs = 0;
+
+    strcpy(program, programAndArgs[0]);
+    while(programAndArgs[lenProgramAndArgs] != NULL)
     {
-        args[i-1] = programAndArgs[i]; 
+        lenProgramAndArgs++;
     }
+    lenProgramAndArgs++;
+
+    char* args[lenProgramAndArgs - 1];
+    
+    for(i = 1; i < lenProgramAndArgs - 1; i++)
+    {
+        strcpy(args[i-1], programAndArgs[i]);
+    }
+    args[i] = NULL;
+
     execvp(program, args);
 }
