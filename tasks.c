@@ -50,7 +50,12 @@ TaskNode* get_tasks(char* path)
         
         prev = current;
     }
+    current->next = NULL;
     fclose(file);
+
+    if (first == NULL)
+        printf("Gotten tasks are NULL");
+
     return first;
 }
 
@@ -106,6 +111,7 @@ char** get_program_and_args(char* command)
 void run_task(struct Task task)
 {
     printf("Runnig task: %s\n", task.command);
+<<<<<<< HEAD
     //int outputFile = open("output.txt", O_WRONLY, O_CREAT);
     char** programAndArgs = get_program_and_args(task.command);
     char* program;
@@ -128,4 +134,46 @@ void run_task(struct Task task)
     args[i] = NULL;
 
     execvp(program, args);
+=======
+}
+
+void print_tasks(TaskNode* tasks)
+{
+    TaskNode* current = tasks;
+    while(current != NULL)
+    {
+        printf("%d:%d - %s - %d\n",
+        current->task->time->hour,
+        current->task->time->minute,
+        current->task->command,
+        current->task->info);
+        printf("remaining sec: %d \n", get_remaining_time(current->task->time));
+        current = current->next;
+    }
+}
+
+void go_to_current(TaskNode* tasks, TaskNode** current_pointer, int* remainingTime)
+{
+    printf("\ngoing to current task\n");
+    *remainingTime = get_remaining_time((*current_pointer)->task->time);
+    while(*remainingTime < -59)
+    {
+        *current_pointer = (*current_pointer)->next;
+        if (*current_pointer == NULL)
+            *current_pointer = tasks;
+        *remainingTime = get_remaining_time((*current_pointer)->task->time);
+    }
+}
+
+void free_tasks(TaskNode* tasks)
+{
+    printf("\nfreeing tasks\n");
+    TaskNode* tmp;
+    while (tasks != NULL)
+    {
+        tmp = tasks;
+        tasks = tasks->next;
+        free(tmp);
+    }
+>>>>>>> signals
 }

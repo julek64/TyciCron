@@ -26,4 +26,7 @@ int time_to_minutes(struct TaskTime* time);
 int get_remaining_time(struct TaskTime* TaskTime);
 int get_tasktime_seconds(struct TaskTime);
 void run_task(struct Task);
+void print_tasks(TaskNode*);
+void go_to_current(TaskNode*, TaskNode**, int*);
+void free_tasks(TaskNode*);
 #endif
