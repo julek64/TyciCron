@@ -6,9 +6,13 @@
 #include <unistd.h>
 #include <sys/types.h>
 
+int INTStatus = 0;
+int USR1Status = 0;
+int USR2Status = 0;
+
 int main(int argc, char* argv)
 {
-    sig_catch();
+    sig_init();
     int pid = getpid();
     printf("\npid: %d\n", pid);
     TaskNode* tasks = get_tasks("input.txt");
@@ -16,33 +20,31 @@ int main(int argc, char* argv)
     int remainingTime;
 
     merge_sort(&tasks);
+
+    print_tasks(tasks);
     current = tasks;
 
     while(current != NULL)
     {
-        printf("%d:%d - %s - %d\n",
-        current->task->time->hour,
-        current->task->time->minute,
-        current->task->command,
-        current->task->info);
-        printf("remaining sec: %d \n", get_remaining_time(current->task->time));
-        current = current->next;
-    }
-    current = tasks;
+        go_to_current(tasks, &current, &remainingTime);
 
-    while(current != NULL)
-    {
-        remainingTime = get_remaining_time(current->task->time);
-        if(remainingTime < -59)
+        while(remainingTime > 0)
         {
-            current = current->next;
-            continue;
-        }
-        printf("Sleeping for %d seconds\n", remainingTime);
-        fflush(stdout);
-        if(remainingTime > 0 )
+            printf("Sleeping for %d seconds\n", remainingTime);
+            fflush(stdout);
             sleep(remainingTime);
-            
+
+            //signal handling
+            if (INTStatus)
+                sig_int(current->task->time, *current->task, tasks);
+            else if (USR1Status)
+                sig_usr1(&tasks, "input.txt", &current, &remainingTime);
+            else if (USR2Status)
+                sig_usr2(tasks);
+
+            remainingTime = get_remaining_time(current->task->time);
+        }
+        
         run_task(*current->task);
         current = current->next;
     }
