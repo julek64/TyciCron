@@ -111,7 +111,6 @@ char** get_program_and_args(char* command)
 void run_task(struct Task task)
 {
     printf("Runnig task: %s\n", task.command);
-<<<<<<< HEAD
     //int outputFile = open("output.txt", O_WRONLY, O_CREAT);
     char** programAndArgs = get_program_and_args(task.command);
     char* program;
@@ -134,7 +133,6 @@ void run_task(struct Task task)
     args[i] = NULL;
 
     execvp(program, args);
-=======
 }
 
 void print_tasks(TaskNode* tasks)
@@ -175,5 +173,4 @@ void free_tasks(TaskNode* tasks)
         tasks = tasks->next;
         free(tmp);
     }
->>>>>>> signals
 }
