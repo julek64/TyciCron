@@ -5,6 +5,7 @@
 #include <time.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <syslog.h>
 
 struct Task* string_to_task(char string[])
 {
@@ -173,4 +174,19 @@ void free_tasks(TaskNode* tasks)
         tasks = tasks->next;
         free(tmp);
     }
+}
+
+void send_left_to_log(TaskNode* tasks)
+{
+    TaskNode* current = tasks;
+    int remainingTime = 0;
+    go_to_current(tasks, &current, &remainingTime);
+    openlog("Tycicron", LOG_PID, LOG_DAEMON);
+    syslog(LOG_INFO, "Listing upcoming tasks...");
+    while (current != NULL)
+    {
+        syslog(LOG_INFO, "At [%d:%d] execute [%s:%d]", current->task->time->hour, current->task->time->minute, current->task->command, current->task->info);
+        current = current->next;
+    }
+    closelog();
 }

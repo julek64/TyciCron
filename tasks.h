@@ -29,4 +29,6 @@ void run_task(struct Task);
 void print_tasks(TaskNode*);
 void go_to_current(TaskNode*, TaskNode**, int*);
 void free_tasks(TaskNode*);
+void send_left_to_log(TaskNode*);
+
 #endif
