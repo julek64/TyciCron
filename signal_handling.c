@@ -44,9 +44,6 @@ void sig_handler(int signo)
 void sig_int(struct TaskTime* time, struct Task task, TaskNode* tasks)
 {
     printf("\nExecuting SIGINT\n");
-    // implementation
-    if (get_remaining_time(time) <= 0)
-        run_task(task);
     INTStatus = 0;
     free_tasks(tasks);
     exit(EXIT_SUCCESS);
@@ -55,7 +52,6 @@ void sig_int(struct TaskTime* time, struct Task task, TaskNode* tasks)
 void sig_usr1(TaskNode** tasks_pointer, char* path, TaskNode** current_pointer, int* remainingTime)
 {
     printf("\nExecuting SIGUSR1\n");
-    // implementation
     if (*tasks_pointer != NULL)
         free_tasks(*tasks_pointer);
     *tasks_pointer = get_tasks(path);
@@ -69,7 +65,6 @@ void sig_usr1(TaskNode** tasks_pointer, char* path, TaskNode** current_pointer, 
 void sig_usr2(TaskNode* tasks)
 {
     printf("\nExecuting SIGUSR2\n");
-    // implementation
     print_tasks(tasks);
     USR2Status = 0;
 }
