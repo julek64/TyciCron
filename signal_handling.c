@@ -65,6 +65,6 @@ void sig_usr1(TaskNode** tasks_pointer, char* path, TaskNode** current_pointer, 
 void sig_usr2(TaskNode* tasks)
 {
     printf("\nExecuting SIGUSR2\n");
-    print_tasks(tasks);
+    send_left_to_log(tasks);
     USR2Status = 0;
 }
