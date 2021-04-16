@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <syslog.h>
+#include <sys/wait.h>
 
 struct Task* string_to_task(char string[])
 {
@@ -109,18 +110,24 @@ char** get_program_and_args(char* command)
     return args;
 }
 
-void run_task(struct Task task)
+int run_task(struct Task task)
 {
     printf("Runnig task: %s\n", task.command);
     char** programAndArgs = get_program_and_args(task.command);
     int status;
+    pid_t child_pid;
+    pid_t tpid;
+
     int i = 1;
     char* program = programAndArgs[0];
+
+
     while(programAndArgs[i] != NULL)
         i++;
 
     char* args[i];
     i = 0; 
+
     while(programAndArgs[i] != NULL)
     {
         args[i] = programAndArgs[i];
@@ -128,9 +135,18 @@ void run_task(struct Task task)
     }
     args[i] = NULL;
     
-    status = execvp(program, args);
-    if(status == -1)
-        perror("execvp");
+    child_pid = fork();
+    if(child_pid == -1)
+        return -1;
+    else if(child_pid == 0){
+        //child process
+        status = execvp(program, args);
+        if(status == -1)
+            perror("execvp");
+        exit(1);
+    }
+
+    return child_pid;
 }
 
 void print_tasks(TaskNode* tasks)
