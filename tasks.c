@@ -114,21 +114,23 @@ void run_task(struct Task task)
     printf("Runnig task: %s\n", task.command);
     char** programAndArgs = get_program_and_args(task.command);
     int status;
-    int i = 0;
-    char* program = "ls";
+    int i = 1;
+    char* program = programAndArgs[0];
     while(programAndArgs[i] != NULL)
         i++;
 
     char* args[i];
-    i = 1; 
+    i = 0; 
     while(programAndArgs[i] != NULL)
     {
-        args[i-1] = programAndArgs[i];
+        args[i] = programAndArgs[i];
         i++;
     }
-    args[i-1] = NULL;
+    args[i] = NULL;
     
     status = execvp(program, args);
+    if(status == -1)
+        perror("execvp");
 }
 
 void print_tasks(TaskNode* tasks)
