@@ -111,28 +111,23 @@ char** get_program_and_args(char* command)
 void run_task(struct Task task)
 {
     printf("Runnig task: %s\n", task.command);
-    //int outputFile = open("output.txt", O_WRONLY, O_CREAT);
     char** programAndArgs = get_program_and_args(task.command);
-    char* program;
-    int i;
-    int lenProgramAndArgs = 0;
+    int status;
+    int i = 0;
+    char* program = "ls";
+    while(programAndArgs[i] != NULL)
+        i++;
 
-    strcpy(program, programAndArgs[0]);
-    while(programAndArgs[lenProgramAndArgs] != NULL)
+    char* args[i];
+    i = 1; 
+    while(programAndArgs[i] != NULL)
     {
-        lenProgramAndArgs++;
+        args[i-1] = programAndArgs[i];
+        i++;
     }
-    lenProgramAndArgs++;
-
-    char* args[lenProgramAndArgs - 1];
+    args[i-1] = NULL;
     
-    for(i = 1; i < lenProgramAndArgs - 1; i++)
-    {
-        strcpy(args[i-1], programAndArgs[i]);
-    }
-    args[i] = NULL;
-
-    execvp(program, args);
+    status = execvp(program, args);
 }
 
 void print_tasks(TaskNode* tasks)
