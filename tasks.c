@@ -169,6 +169,7 @@ int run_task(struct Task task)
     else if(child_pid == 0){
         //child process
         status = execvp(program, args);
+
         if(status == -1)
             perror("execvp");
         exit(1);
@@ -200,7 +201,14 @@ void go_to_current(TaskNode* tasks, TaskNode** current_pointer, int* remainingTi
     {
         *current_pointer = (*current_pointer)->next;
         if (*current_pointer == NULL)
+        {
             *current_pointer = tasks;
+            struct TaskTime nextDay;
+            nextDay.hour = 23;
+            nextDay.minute = 59;
+            *remainingTime = get_remaining_time(&nextDay) + 60;
+            break;
+        }
         *remainingTime = get_remaining_time((*current_pointer)->task->time);
     }
 }
