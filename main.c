@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/types.h>
+#include <sys/wait.h>
 
 int INTStatus = 0;
 int USR1Status = 0;
@@ -14,6 +15,8 @@ int main(int argc, char* argv)
 {
     sig_init();
     int pid = getpid();
+    int status;
+    int childPid;
     printf("\npid: %d\n", pid);
     TaskNode* tasks = get_tasks("input.txt");
     TaskNode* current;
@@ -36,17 +39,24 @@ int main(int argc, char* argv)
 
             //signal handling
             if (INTStatus)
+            {                
+                do
+                {
+                    childPid = wait(NULL);
+                }while(childPid > 0);
+
                 sig_int(current->task->time, *current->task, tasks);
+            }
             else if (USR1Status)
                 sig_usr1(&tasks, "input.txt", &current, &remainingTime);
             else if (USR2Status)
                 sig_usr2(tasks);
 
+            break;
             remainingTime = get_remaining_time(current->task->time);
         }
         
-        run_task(*current->task);
-        current = current->next;
+        status = run_task(*current->task);
     }
 
     return 0;

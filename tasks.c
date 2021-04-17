@@ -7,6 +7,7 @@
 #include <fcntl.h>
 #include <syslog.h>
 #include <sys/wait.h>
+#include <signal.h>
 
 struct Task* string_to_task(char string[])
 {
@@ -95,7 +96,9 @@ char** get_program_and_args(char* command)
         }
     }
     char** args = malloc((len+2) * sizeof(char*));
-    char* str = strtok(command," ");
+    char* commandCopy = malloc(strlen(command) * sizeof(char));
+    strcpy(commandCopy, command);
+    char* str = strtok(commandCopy," ");
     int i = 0;
     while(str != NULL)
     {
@@ -107,6 +110,8 @@ char** get_program_and_args(char* command)
     }
     args[i] = malloc(sizeof(char));
     args[i] = NULL;
+
+    free(commandCopy);
     return args;
 }
 
@@ -168,8 +173,8 @@ int run_task(struct Task task)
         return -1;
     else if(child_pid == 0){
         //child process
-        status = execvp(program, args);
-
+        signal(SIGINT, SIG_IGN);
+        status = execvp(program, args);   
         if(status == -1)
             perror("execvp");
         exit(1);
