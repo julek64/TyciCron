@@ -23,19 +23,20 @@ void sig_init()
 
 void sig_handler(int signo)
 {
+    printf("\n");
     if (signo == SIGUSR1)
     {
-        printf("\nCaught SIGUSR1\n");
+        printf("Caught SIGUSR1\n");
         USR1Status = 1;
     }
     else if (signo == SIGUSR2)
     {
-        printf("\nCaught SIGUSR2\n");
+        printf("Caught SIGUSR2\n");
         USR2Status = 1;
     }
     else if (signo == SIGINT)
     {
-        printf("\nCaught SIGINT\n");
+        printf("Caught SIGINT\n");
         INTStatus = 1;
     }
 }
@@ -43,7 +44,7 @@ void sig_handler(int signo)
 
 void sig_int(struct TaskTime* time, struct Task task, TaskNode* tasks)
 {
-    printf("\nExecuting SIGINT\n");
+    printf("Executing SIGINT\n");
     INTStatus = 0;
     free_tasks(tasks);
     exit(EXIT_SUCCESS);
@@ -51,7 +52,7 @@ void sig_int(struct TaskTime* time, struct Task task, TaskNode* tasks)
 
 void sig_usr1(TaskNode** tasks_pointer, char* path, TaskNode** current_pointer, int* remainingTime)
 {
-    printf("\nExecuting SIGUSR1\n");
+    printf("Executing SIGUSR1\n");
     if (*tasks_pointer != NULL)
         free_tasks(*tasks_pointer);
     *tasks_pointer = get_tasks(path);
@@ -64,7 +65,7 @@ void sig_usr1(TaskNode** tasks_pointer, char* path, TaskNode** current_pointer, 
 
 void sig_usr2(TaskNode* tasks)
 {
-    printf("\nExecuting SIGUSR2\n");
+    printf("Executing SIGUSR2\n");
     send_left_to_log(tasks);
     USR2Status = 0;
 }

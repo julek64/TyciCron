@@ -200,7 +200,7 @@ void print_tasks(TaskNode* tasks)
 
 void go_to_current(TaskNode* tasks, TaskNode** current_pointer, int* remainingTime)
 {
-    printf("\ngoing to current task\n");
+    printf("Going to current task\n");
     *remainingTime = get_remaining_time((*current_pointer)->task->time);
     while(*remainingTime < -59)
     {
@@ -220,7 +220,7 @@ void go_to_current(TaskNode* tasks, TaskNode** current_pointer, int* remainingTi
 
 void free_tasks(TaskNode* tasks)
 {
-    printf("\nfreeing tasks\n");
+    printf("Freeing tasks\n");
     TaskNode* tmp;
     while (tasks != NULL)
     {
