@@ -177,11 +177,16 @@ int run_task(struct Task task)
         //child process
         signal(SIGINT, SIG_IGN);
         write_to_file(task);
-        status = execvp(program, args);
-        send_task_to_log(task, 0);      // 0 trzeba zamienic na kod wyjscia + naprawic fakt ze nie loguje (funkcja dzialala podczas testu w procesie rodzicu)
-        if(status == -1)
-            perror("execvp");
-        exit(1);
+        pid_t exec_pid = fork();
+        if (exec_pid == 0)
+        {
+            signal(SIGINT, SIG_IGN);
+            status = execvp(program, args);
+            if(status == -1)
+                perror("execvp");
+            exit(1);
+        }
+        exit(send_task_to_log_on_finish(task, exec_pid));
     }
     return child_pid;
 }
@@ -253,4 +258,16 @@ void send_task_to_log(struct Task task, int output)
     openlog("TycicronChild", LOG_PID, LOG_DAEMON);
     syslog(LOG_INFO, "Executed task [%s] with return value [%d]", task.command, output);
     closelog();
+}
+
+int send_task_to_log_on_finish(struct Task task, int pid)
+{
+    int exec_status;
+    waitpid(pid, &exec_status, WUNTRACED);
+    if (WIFEXITED(exec_status))
+    {
+        send_task_to_log(task, WEXITSTATUS(exec_status));
+        return 0;
+    }
+    return 1;
 }

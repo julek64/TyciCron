@@ -32,5 +32,6 @@ void go_to_current(TaskNode*, TaskNode**, int*);
 void free_tasks(TaskNode*);
 void send_left_to_log(TaskNode*);
 void send_task_to_log(struct Task, int);
+int send_task_to_log_on_finish(struct Task, int);
 
 #endif
