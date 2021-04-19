@@ -115,6 +115,36 @@ char** get_program_and_args(char* command)
     return args;
 }
 
+void write_to_file(struct Task task)
+{
+    int outputFile = open("output.txt", O_WRONLY|O_CREAT|O_APPEND, 0666);
+
+    size_t len = 0;
+    len = snprintf(NULL, len, "\n\n\n%d:%d:%s:%d\n\n", task.time->hour, task.time->minute, task.command, task.info);
+    char *command = calloc (1, sizeof *command * len + 1);
+    snprintf(command, len + 1, "\n\n\n%d:%d:%s:%d\n\n", task.time->hour, task.time->minute, task.command, task.info);
+    
+    write(outputFile, command, strlen(command));
+
+    if(task.info == 0)
+    {
+        close(1); //Close stdout
+        dup(outputFile);
+    }
+    if(task.info == 1)
+    {
+        close(2); //Close stderr
+        dup(outputFile);
+    }
+    else if(task.info == 2)
+    {
+        close(1); //Close stdout
+        dup(outputFile);
+        close(2); //Close stderr
+        dup(outputFile);
+    }
+}
+
 int run_task(struct Task task)
 {
     printf("Runnig task: %s\n", task.command);
@@ -140,40 +170,13 @@ int run_task(struct Task task)
     }
     args[i] = NULL;
     
-    int outputFile = open("output.txt", O_WRONLY|O_CREAT|O_APPEND, 0666);
-
-    //Convert task to string
-    size_t len = 0;
-    len = snprintf(NULL, len, "\n\n\n%d:%d:%s:%d\n\n", task.time->hour, task.time->minute, task.command, task.info);
-    char *command = calloc (1, sizeof *command * len + 1);
-    snprintf(command, len + 1, "\n\n\n%d:%d:%s:%d\n\n", task.time->hour, task.time->minute, task.command, task.info);
-    
-    write(outputFile, command, strlen(command));
-
-    if(task.info == 0)
-    {
-        close(1); //Close stdout
-        dup(outputFile);
-    }
-    if(task.info == 1)
-    {
-        close(2); //Close stderr
-        dup(outputFile);
-    }
-    else if(task.info == 2)
-    {
-        close(1); //Close stdout
-        dup(outputFile);
-        close(2); //Close stderr
-        dup(outputFile);
-    }
-
     child_pid = fork();
     if(child_pid == -1)
         return -1;
     else if(child_pid == 0){
         //child process
         signal(SIGINT, SIG_IGN);
+        write_to_file(task);
         status = execvp(program, args);   
         if(status == -1)
             perror("execvp");
