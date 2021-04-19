@@ -177,12 +177,12 @@ int run_task(struct Task task)
         //child process
         signal(SIGINT, SIG_IGN);
         write_to_file(task);
-        status = execvp(program, args);   
+        status = execvp(program, args);
+        send_task_to_log(task, 0);      // 0 trzeba zamienic na kod wyjscia + naprawic fakt ze nie loguje (funkcja dzialala podczas testu w procesie rodzicu)
         if(status == -1)
             perror("execvp");
         exit(1);
     }
-
     return child_pid;
 }
 
@@ -245,5 +245,12 @@ void send_left_to_log(TaskNode* tasks)
         syslog(LOG_INFO, "At [%d:%d] execute [%s:%d]", current->task->time->hour, current->task->time->minute, current->task->command, current->task->info);
         current = current->next;
     }
+    closelog();
+}
+
+void send_task_to_log(struct Task task, int output)
+{
+    openlog("TycicronChild", LOG_PID, LOG_DAEMON);
+    syslog(LOG_INFO, "Executed task [%s] with return value [%d]", task.command, output);
     closelog();
 }
