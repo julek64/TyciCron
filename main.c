@@ -17,7 +17,7 @@ int main(int argc, char* argv)
     int pid = getpid();
     int status;
     int childPid;
-    printf("\npid: %d\n", pid);
+    printf("Pid: %d\n", pid);
     TaskNode* tasks = get_tasks("input.txt");
     TaskNode* current;
     int remainingTime;
@@ -29,6 +29,7 @@ int main(int argc, char* argv)
 
     while(current != NULL)
     {
+        printf("\n");
         go_to_current(tasks, &current, &remainingTime);
 
         while(remainingTime > 0)
@@ -52,11 +53,11 @@ int main(int argc, char* argv)
             else if (USR2Status)
                 sig_usr2(tasks);
 
-            break;
             remainingTime = get_remaining_time(current->task->time);
         }
         
         status = run_task(*current->task);
+        current = current->next;
     }
 
     return 0;
