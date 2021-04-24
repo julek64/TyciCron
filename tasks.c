@@ -9,48 +9,117 @@
 #include <sys/wait.h>
 #include <signal.h>
 
+#define MAX_ARGS 10
+
 struct Task* string_to_task(char string[])
 {
-    struct Task* task = malloc(sizeof(struct Task));
+    struct Task *task = malloc(sizeof(struct Task));
     const char d[2] = ":";
-    char * str;
+    char* str;
+    char* command;
 
     task->time = malloc(sizeof(struct TaskTime));
 
-    str = strtok (string, d);
+    str = strtok(string, d);
     task->time->hour = atoi(str);
-    str = strtok (NULL, d);
+    str = strtok(NULL, d);
     task->time->minute = atoi(str);
-    str = strtok (NULL, d);
-    task->command = (char *)malloc(strlen(str) * (sizeof(char) + 1));
-    strcpy(task->command, str);
-    str = strtok (NULL, d);
+
+    str = strtok(NULL, d);
+    command = (char *)malloc(strlen(str) * (sizeof(char) + 1));
+    strcpy(command, str);
+    task->strCommand = (char *)malloc(strlen(str) * (sizeof(char) + 1));
+    strcpy(task->strCommand, str);
+
+    str = strtok(NULL, d);
     task->info = atoi(str);
+
+    task->commands = str_to_commands(command);
+    free(command);
     return task;
 }
 
-TaskNode* get_tasks(char* path)
+CommandNode* str_to_commands(char *str)
 {
-    FILE * file;
-    TaskNode* current;
-    TaskNode* prev;
-    TaskNode* first = NULL;
+    CommandNode* head = malloc(sizeof(CommandNode));
+    CommandNode* current = head;
+    CommandNode* prev;
+    char* savePtr = str;
+    char* token;
+
+    const char d[2] = "|";
+    token = strtok_r(str, d, &savePtr);
+    while(token != NULL)
+    {
+        current->command = str_to_command(token);
+        prev = current;
+        current = current->next;
+        token = strtok_r(NULL, d, &savePtr);
+        if(token != NULL)
+        {
+            current = malloc(sizeof(CommandNode));
+            prev->next = current;
+        }
+    }
+
+    return head;
+}
+
+struct Command* str_to_command(char *str)
+{
+    struct Command* command;
+    char* oldStr = malloc(strlen(str) * sizeof(char));
+    char** args;
+    strcpy(oldStr, str);
+    command = malloc(sizeof(struct Command));
+    str = strtok(str, " ");
+    command->program = malloc(strlen(str) * sizeof(char));
+    strcpy(command->program, str);
+    int i = 1;
+    while(str != NULL)
+    {
+        str = strtok(NULL, " ");
+        i++;
+    }
+    command->argc = i-1;
+    args = malloc(i * sizeof(char*));
+    oldStr = strtok(oldStr, " ");
+    i = 0;
+    while(oldStr != NULL)
+    {
+        char* cmd = malloc(strlen(oldStr) * sizeof(char));
+        strcpy(cmd, oldStr);
+        args[i] = cmd;
+        oldStr = strtok(NULL, " ");
+        i++;
+    }
+    args[i] = NULL;
+    command->args = args;
+    return command;
+}
+
+TaskNode* get_tasks(char *path)
+{
+    FILE *file;
+    TaskNode *current;
+    TaskNode *prev;
+    TaskNode *first = NULL;
     file = fopen(path, "r");
 
-    if(file == NULL)
+    if (file == NULL)
         return first;
 
     char buffer[500];
-    while(fgets(buffer, 500, file) != NULL)
+    while (fgets(buffer, 500, file) != NULL)
     {
         current = malloc(sizeof(TaskNode));
-        if(first == NULL)
+        if (first == NULL)
             first = current;
         else
             prev->next = current;
-        
+
         current->task = string_to_task(buffer);
-        
+
         prev = current;
     }
     current->next = NULL;
@@ -120,9 +189,9 @@ void write_to_file(struct Task task)
     int outputFile = open("output.txt", O_WRONLY|O_CREAT|O_APPEND, 0666);
 
     size_t len = 0;
-    len = snprintf(NULL, len, "\n\n\n%d:%d:%s:%d\n\n", task.time->hour, task.time->minute, task.command, task.info);
+    len = snprintf(NULL, len, "\n\n\n%d:%d:%s:%d\n\n", task.time->hour, task.time->minute, task.strCommand, task.info);
     char *command = calloc (1, sizeof *command * len + 1);
-    snprintf(command, len + 1, "\n\n\n%d:%d:%s:%d\n\n", task.time->hour, task.time->minute, task.command, task.info);
+    snprintf(command, len + 1, "\n\n\n%d:%d:%s:%d\n\n", task.time->hour, task.time->minute, task.strCommand, task.info);
     
     write(outputFile, command, strlen(command));
 
@@ -147,8 +216,8 @@ void write_to_file(struct Task task)
 
 int run_task(struct Task task)
 {
-    printf("Runnig task: %s\n", task.command);
-    char** programAndArgs = get_program_and_args(task.command);
+    printf("Runnig task: %s\n", task.strCommand);
+    char** programAndArgs = get_program_and_args(task.strCommand);
     int status;
     pid_t child_pid;
     pid_t tpid;
@@ -199,7 +268,7 @@ void print_tasks(TaskNode* tasks)
         printf("%d:%d - %s - %d\n",
         current->task->time->hour,
         current->task->time->minute,
-        current->task->command,
+        current->task->strCommand,
         current->task->info);
         printf("remaining sec: %d \n", get_remaining_time(current->task->time));
         current = current->next;
@@ -247,7 +316,7 @@ void send_left_to_log(TaskNode* tasks)
     syslog(LOG_INFO, "Listing upcoming tasks...");
     while (current != NULL)
     {
-        syslog(LOG_INFO, "At [%d:%d] execute [%s:%d]", current->task->time->hour, current->task->time->minute, current->task->command, current->task->info);
+        syslog(LOG_INFO, "At [%d:%d] execute [%s:%d]", current->task->time->hour, current->task->time->minute, current->task->strCommand, current->task->info);
         current = current->next;
     }
     closelog();
@@ -256,7 +325,7 @@ void send_left_to_log(TaskNode* tasks)
 void send_task_to_log(struct Task task, int output)
 {
     openlog("TycicronChild", LOG_PID, LOG_DAEMON);
-    syslog(LOG_INFO, "Executed task [%s] with return value [%d]", task.command, output);
+    syslog(LOG_INFO, "Executed task [%s] with return value [%d]", task.strCommand, output);
     closelog();
 }
 
