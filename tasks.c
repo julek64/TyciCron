@@ -9,8 +9,6 @@
 #include <sys/wait.h>
 #include <signal.h>
 
-#define MAX_ARGS 10
-
 struct Task* string_to_task(char string[])
 {
     struct Task *task = malloc(sizeof(struct Task));
@@ -221,24 +219,10 @@ int run_task(struct Task task)
     int status;
     pid_t child_pid;
     pid_t tpid;
+    CommandNode* currentCmd = task.commands;
+    int p[2];
+    int fdin = 0;
 
-    int i = 1;
-    char* program = programAndArgs[0];
-
-
-    while(programAndArgs[i] != NULL)
-        i++;
-
-    char* args[i];
-    i = 0; 
-
-    while(programAndArgs[i] != NULL)
-    {
-        args[i] = programAndArgs[i];
-        i++;
-    }
-    args[i] = NULL;
-    
     child_pid = fork();
     if(child_pid == -1)
         return -1;
@@ -246,16 +230,28 @@ int run_task(struct Task task)
         //child process
         signal(SIGINT, SIG_IGN);
         write_to_file(task);
-        pid_t exec_pid = fork();
-        if (exec_pid == 0)
+        while(currentCmd != NULL)
         {
-            signal(SIGINT, SIG_IGN);
-            status = execvp(program, args);
-            if(status == -1)
-                perror("execvp");
-            exit(1);
+            pipe(p);
+            pid_t exec_pid = fork();
+            if (exec_pid == 0)
+            {
+                signal(SIGINT, SIG_IGN);
+                dup2(fdin, 0);
+                if(currentCmd->next != NULL)
+                    dup2(p[1], 1);
+                close(p[0]);
+
+                status = execvp(currentCmd->command->program, currentCmd->command->args);
+                if(status == -1)
+                    perror("execvp");
+                exit(1);
+            }
+            close(p[1]);
+            fdin = p[0];
+            currentCmd = currentCmd->next;
+            //exit(send_task_to_log_on_finish(task, exec_pid));
         }
-        exit(send_task_to_log_on_finish(task, exec_pid));
     }
     return child_pid;
 }
