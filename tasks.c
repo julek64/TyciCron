@@ -187,9 +187,9 @@ void write_to_file(struct Task task)
     int outputFile = open("output.txt", O_WRONLY|O_CREAT|O_APPEND, 0666);
 
     size_t len = 0;
-    len = snprintf(NULL, len, "\n\n\n%d:%d:%s:%d\n\n", task.time->hour, task.time->minute, task.strCommand, task.info);
+    len = snprintf(NULL, len, "%d:%d:%s:%d\n", task.time->hour, task.time->minute, task.strCommand, task.info);
     char *command = calloc (1, sizeof *command * len + 1);
-    snprintf(command, len + 1, "\n\n\n%d:%d:%s:%d\n\n", task.time->hour, task.time->minute, task.strCommand, task.info);
+    snprintf(command, len + 1, "%d:%d:%s:%d\n", task.time->hour, task.time->minute, task.strCommand, task.info);
     
     write(outputFile, command, strlen(command));
 
@@ -229,7 +229,6 @@ int run_task(struct Task task)
     else if(child_pid == 0){
         //child process
         signal(SIGINT, SIG_IGN);
-        write_to_file(task);
         while(currentCmd != NULL)
         {
             pipe(p);
@@ -240,6 +239,8 @@ int run_task(struct Task task)
                 dup2(fdin, 0);
                 if(currentCmd->next != NULL)
                     dup2(p[1], 1);
+                else
+                    write_to_file(task); 
                 close(p[0]);
 
                 status = execvp(currentCmd->command->program, currentCmd->command->args);
@@ -247,11 +248,15 @@ int run_task(struct Task task)
                     perror("execvp");
                 exit(1);
             }
-            close(p[1]);
-            fdin = p[0];
-            currentCmd = currentCmd->next;
+            else
+            {
+                close(p[1]);
+                fdin = p[0];
+                currentCmd = currentCmd->next;
+            }
             //exit(send_task_to_log_on_finish(task, exec_pid));
         }
+        exit(0);
     }
     return child_pid;
 }
