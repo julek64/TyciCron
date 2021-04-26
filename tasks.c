@@ -229,6 +229,7 @@ int run_task(struct Task task)
     else if(child_pid == 0){
         //child process
         signal(SIGINT, SIG_IGN);
+        int pipeStatus = 0; // 0 - good, 1 - bad
         while(currentCmd != NULL)
         {
             pipe(p);
@@ -244,6 +245,7 @@ int run_task(struct Task task)
                 close(p[0]);
 
                 status = execvp(currentCmd->command->program, currentCmd->command->args);
+                write_to_file(task);
                 if(status == -1)
                     perror("execvp");
                 exit(1);
@@ -254,7 +256,13 @@ int run_task(struct Task task)
                 fdin = p[0];
                 currentCmd = currentCmd->next;
             }
-            //exit(send_task_to_log_on_finish(task, exec_pid));
+            
+            pipeStatus = return_exit_status(exec_pid);
+            if (pipeStatus != 0 || currentCmd == NULL)
+            {
+                send_task_to_log(task, pipeStatus);
+                exit(pipeStatus);
+            }
         }
         exit(0);
     }
@@ -340,4 +348,11 @@ int send_task_to_log_on_finish(struct Task task, int pid)
         return 0;
     }
     return 1;
+}
+
+int return_exit_status(int pid)
+{
+    int exec_status;
+    waitpid(pid, &exec_status, WUNTRACED);
+    return WEXITSTATUS(exec_status);
 }

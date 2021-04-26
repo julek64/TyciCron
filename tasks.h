@@ -49,4 +49,5 @@ void free_tasks(TaskNode*);
 void send_left_to_log(TaskNode*);
 void send_task_to_log(struct Task, int);
 int send_task_to_log_on_finish(struct Task, int);
+int return_exit_status(int);
 #endif
