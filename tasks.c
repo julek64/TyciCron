@@ -312,6 +312,19 @@ void free_tasks(TaskNode* tasks)
     {
         tmp = tasks;
         tasks = tasks->next;
+        free(tmp->task->time);
+        CommandNode* command = tmp->task->commands;
+        while(command != NULL)
+        {
+            CommandNode* tmpCommand = command;
+            command = tmpCommand->next;
+            free(tmpCommand->command->program);
+            free(tmpCommand->command->args);
+            free(tmpCommand->command);
+        }
+        free(tmp->task->commands);
+        free(tmp->task->strCommand);
+        free(tmp->task);
         free(tmp);
     }
 }
