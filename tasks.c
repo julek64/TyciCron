@@ -229,7 +229,7 @@ int run_task(struct Task task)
     else if(child_pid == 0){
         //child process
         signal(SIGINT, SIG_IGN);
-        int pipeStatus = 0; // 0 - good, 1 - bad
+        int pipeStatus = 0;
         while(currentCmd != NULL)
         {
             pipe(p);
@@ -349,18 +349,6 @@ void send_task_to_log(struct Task task, int output)
     openlog("TycicronChild", LOG_PID, LOG_DAEMON);
     syslog(LOG_INFO, "Executed task [%s] with return value [%d]", task.strCommand, output);
     closelog();
-}
-
-int send_task_to_log_on_finish(struct Task task, int pid)
-{
-    int exec_status;
-    waitpid(pid, &exec_status, WUNTRACED);
-    if (WIFEXITED(exec_status))
-    {
-        send_task_to_log(task, WEXITSTATUS(exec_status));
-        return 0;
-    }
-    return 1;
 }
 
 int return_exit_status(int pid)
