@@ -296,6 +296,7 @@ void print_tasks(TaskNode* tasks)
     }
 }
 
+// get current task from tasks list and remaining time before execute this task
 void go_to_current(TaskNode* tasks, TaskNode** current_pointer, int* remainingTime)
 {
     //printf("Going to current task\n");
