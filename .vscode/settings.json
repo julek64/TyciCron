@@ -7,7 +7,7 @@
         {
             "cwd": "/home/ubuntu/repos/TyciCron/bin",
             "binaryPath": "/home/ubuntu/repos/TyciCron/bin/main",
-            "binaryArgs": []
+            "binaryArgs": ["in.txt", "out.txt"]
         }
     ]
 }

@@ -11,14 +11,30 @@ int INTStatus = 0;
 int USR1Status = 0;
 int USR2Status = 0;
 
-int main(int argc, char* argv)
+char* inputFile;
+char* outputFile;
+
+int main(int argc, char* argv[])
 {
     sig_init();
     int pid = getpid();
     int status;
     int childPid;
     //printf("Pid: %d\n", pid);
-    TaskNode* tasks = get_tasks("input.txt");
+    
+    if(argc < 3)
+    {
+        //default file names
+        inputFile = "input.txt";
+        outputFile = "output.txt";
+    } 
+    else
+    {
+        //use file names from args
+        inputFile = argv[1];
+        outputFile = argv[2];
+    }
+    TaskNode* tasks = get_tasks(inputFile);
     TaskNode* current;
     int remainingTime;
 
@@ -35,7 +51,9 @@ int main(int argc, char* argv)
         while(remainingTime > 0)
         {
             //printf("Sleeping for %d seconds\n", remainingTime);
-            fflush(stdout);
+            //fflush(stdout);
+
+            //wait for next task
             sleep(remainingTime);
 
             //signal handling
@@ -49,7 +67,7 @@ int main(int argc, char* argv)
                 sig_int(current->task->time, *current->task, tasks);
             }
             else if (USR1Status)
-                sig_usr1(&tasks, "input.txt", &current, &remainingTime);
+                sig_usr1(&tasks, inputFile, &current, &remainingTime);
             else if (USR2Status)
                 sig_usr2(tasks);
 
