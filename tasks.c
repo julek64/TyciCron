@@ -212,7 +212,6 @@ void write_to_file(struct Task task)
 int run_task(struct Task task)
 {
     //printf("Runnig task: %s\n", task.strCommand);
-    char** programAndArgs = get_program_and_args(task.strCommand);
     int status;
     pid_t child_pid;
     pid_t tpid;

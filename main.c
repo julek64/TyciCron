@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <fcntl.h>
 
 int INTStatus = 0;
 int USR1Status = 0;
@@ -22,11 +23,15 @@ int main(int argc, char* argv[])
     int childPid;
     //printf("Pid: %d\n", pid);
     
+    TaskNode* tasks;
+    TaskNode* current;
+    int remainingTime;
+
     if(argc < 3)
     {
         //default file names
-        inputFile = "input.txt";
-        outputFile = "output.txt";
+        inputFile = "/home/input.txt";
+        outputFile = "/home/output.txt";
     } 
     else
     {
@@ -34,10 +39,26 @@ int main(int argc, char* argv[])
         inputFile = argv[1];
         outputFile = argv[2];
     }
-    TaskNode* tasks = get_tasks(inputFile);
-    TaskNode* current;
-    int remainingTime;
 
+    //start daemon mode
+    pid = fork();
+    if (pid == -1)
+        return -1;
+    else if (pid != 0)
+        exit (EXIT_SUCCESS);
+    
+    //new session and process group
+    if (setsid ( ) == -1)
+        return -1;
+    //set working directory to main directory
+    if (chdir ("/") == -1)
+        return -1;
+    //set 0, 1, 2 descriptor to /dev/null
+    open ("/dev/null", O_RDWR);
+    dup (0);
+    dup (0);
+
+    tasks = get_tasks(inputFile);
     merge_sort(&tasks);
 
     //print_tasks(tasks);
