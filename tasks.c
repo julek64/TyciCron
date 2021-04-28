@@ -219,29 +219,33 @@ int run_task(struct Task task)
     int p[2];
     int fdin = 0;
 
+    //create new process
     child_pid = fork();
     if(child_pid == -1)
         return -1;
     else if(child_pid == 0){
         //child process
-        signal(SIGINT, SIG_IGN);
+        signal(SIGINT, SIG_IGN); //ignore signals
         int pipeStatus = 0;
-        while(currentCmd != NULL)
+        while(currentCmd != NULL) //execute all commands
         {
             pipe(p);
-            pid_t exec_pid = fork();
+            pid_t exec_pid = fork(); //create new process
             if (exec_pid == 0)
             {
-                signal(SIGINT, SIG_IGN);
+                signal(SIGINT, SIG_IGN); //ignore signals
+
+                //redirect previous output to input of next process
                 dup2(fdin, 0);
                 if(currentCmd->next != NULL)
                     dup2(p[1], 1);
                 else
                     write_to_file(task); 
                 close(p[0]);
-
+                
+                //execute command
                 status = execvp(currentCmd->command->program, currentCmd->command->args);
-                write_to_file(task);
+                write_to_file(task); //save output to outfile
                 if(status == -1)
                     perror("execvp");
                 exit(1);
@@ -252,7 +256,7 @@ int run_task(struct Task task)
                 fdin = p[0];
                 currentCmd = currentCmd->next;
             }
-            
+            //send info to syslog
             pipeStatus = return_exit_status(exec_pid);
             if (pipeStatus != 0 || currentCmd == NULL)
             {
