@@ -9,6 +9,7 @@
 #include <sys/wait.h>
 #include <signal.h>
 
+// convert string from input line to task struct
 struct Task* string_to_task(char string[])
 {
     struct Task *task = malloc(sizeof(struct Task));
@@ -37,6 +38,7 @@ struct Task* string_to_task(char string[])
     return task;
 }
 
+// convert string to list of commands
 CommandNode* str_to_commands(char *str)
 {
     CommandNode* head = malloc(sizeof(CommandNode));
@@ -63,6 +65,7 @@ CommandNode* str_to_commands(char *str)
     return head;
 }
 
+// convert string to single command
 struct Command* str_to_command(char *str)
 {
     struct Command* command;
@@ -96,6 +99,7 @@ struct Command* str_to_command(char *str)
     return command;
 }
 
+// get tasks from path file
 TaskNode* get_tasks(char *path)
 {
     FILE *file;
@@ -126,11 +130,13 @@ TaskNode* get_tasks(char *path)
     return first;
 }
 
+// convert time from hours and minutes format to minutes value
 int time_to_minutes(struct TaskTime* time)
 {
     return (time->hour * 60) + time->minute;
 }
 
+// get remaining time before execute task 
 int get_remaining_time(struct TaskTime* TaskTime)
 {
     time_t now = time(0);
@@ -144,11 +150,13 @@ int get_remaining_time(struct TaskTime* TaskTime)
     return remainingSeconds;
 }
 
+// convert time from hours and minutes format to seconds value
 int get_tasktime_seconds(struct TaskTime t)
 {
     return t.hour * 3600 + t.minute * 60;
 }
 
+// get program and args from Task.strCommand
 char** get_program_and_args(char* command)
 {
     int len = 0;
@@ -179,6 +187,8 @@ char** get_program_and_args(char* command)
     return args;
 }
 
+
+// according to the task info, print to outfile task command and stdout/stderr or both
 void write_to_file(struct Task task)
 {
     int outputFile = open("output.txt", O_WRONLY|O_CREAT|O_APPEND, 0666);
@@ -209,6 +219,7 @@ void write_to_file(struct Task task)
     }
 }
 
+// run the provided task
 int run_task(struct Task task)
 {
     //printf("Runnig task: %s\n", task.strCommand);
@@ -269,6 +280,7 @@ int run_task(struct Task task)
     return child_pid;
 }
 
+// print in the console info about tasks and remaining time to execute
 void print_tasks(TaskNode* tasks)
 {
     TaskNode* current = tasks;
@@ -304,6 +316,7 @@ void go_to_current(TaskNode* tasks, TaskNode** current_pointer, int* remainingTi
     }
 }
 
+// frees up space allocated by tasks
 void free_tasks(TaskNode* tasks)
 {
     //printf("Freeing tasks\n");
@@ -329,6 +342,7 @@ void free_tasks(TaskNode* tasks)
     }
 }
 
+// send info about upcoming tasks to syslog
 void send_left_to_log(TaskNode* tasks)
 {
     TaskNode* current = tasks;
@@ -344,6 +358,7 @@ void send_left_to_log(TaskNode* tasks)
     closelog();
 }
 
+// send info about executing task to syslog
 void send_task_to_log(struct Task task, int output)
 {
     openlog("TycicronChild", LOG_PID, LOG_DAEMON);
@@ -351,6 +366,7 @@ void send_task_to_log(struct Task task, int output)
     closelog();
 }
 
+// return exit status of a executed task
 int return_exit_status(int pid)
 {
     int exec_status;
