@@ -11,6 +11,8 @@ extern int INTStatus;
 extern int USR1Status;
 extern int USR2Status;
 
+
+// initializes signal handling
 void sig_init()
 {
     if (signal(SIGUSR1, sig_handler) == SIG_ERR)
@@ -21,6 +23,7 @@ void sig_init()
         printf("Error handling SIGINT\n");
 }
 
+// sets specified global variables to needed state based on the signal caught
 void sig_handler(int signo)
 {
     printf("\n");
@@ -42,6 +45,7 @@ void sig_handler(int signo)
 }
 
 
+// handles INT signal
 void sig_int(struct TaskTime* time, struct Task task, TaskNode* tasks)
 {
     printf("Executing SIGINT\n");
@@ -50,6 +54,8 @@ void sig_int(struct TaskTime* time, struct Task task, TaskNode* tasks)
     exit(EXIT_SUCCESS);
 }
 
+
+// handles USR1 signal
 void sig_usr1(TaskNode** tasks_pointer, char* path, TaskNode** current_pointer, int* remainingTime)
 {
     printf("Executing SIGUSR1\n");
@@ -63,6 +69,8 @@ void sig_usr1(TaskNode** tasks_pointer, char* path, TaskNode** current_pointer, 
     USR1Status = 0;
 }
 
+
+// handles USR2 signal
 void sig_usr2(TaskNode* tasks)
 {
     printf("Executing SIGUSR2\n");

@@ -7,6 +7,7 @@ TaskNode* merge(TaskNode* a, TaskNode* b);
 void split(TaskNode* source, TaskNode** front_pointer, TaskNode** back_pointer);
 int time_to_minutes(struct TaskTime*);
 
+// sorts tasks by time to execution using merge sort algorithm
 void merge_sort(TaskNode** root_pointer)
 {
     TaskNode* root = *root_pointer;
@@ -25,6 +26,7 @@ void merge_sort(TaskNode** root_pointer)
     *root_pointer = merge(a, b);
 }
 
+// merges two TaskNodes specified based on time to execution
 TaskNode* merge(TaskNode* a, TaskNode* b)
 {
     TaskNode* result = NULL;
@@ -47,6 +49,7 @@ TaskNode* merge(TaskNode* a, TaskNode* b)
     return (result);
 }
 
+// splits TaskNode list into two halves
 void split(TaskNode* source, TaskNode** front_pointer, TaskNode** back_pointer)
 {
     TaskNode* fast;
