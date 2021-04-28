@@ -123,9 +123,6 @@ TaskNode* get_tasks(char *path)
     current->next = NULL;
     fclose(file);
 
-    if (first == NULL)
-        printf("Gotten tasks are NULL");
-
     return first;
 }
 
@@ -214,7 +211,7 @@ void write_to_file(struct Task task)
 
 int run_task(struct Task task)
 {
-    printf("Runnig task: %s\n", task.strCommand);
+    //printf("Runnig task: %s\n", task.strCommand);
     char** programAndArgs = get_program_and_args(task.strCommand);
     int status;
     pid_t child_pid;
@@ -286,7 +283,7 @@ void print_tasks(TaskNode* tasks)
 
 void go_to_current(TaskNode* tasks, TaskNode** current_pointer, int* remainingTime)
 {
-    printf("Going to current task\n");
+    //printf("Going to current task\n");
     *remainingTime = get_remaining_time((*current_pointer)->task->time);
     while(*remainingTime < -59)
     {
@@ -306,7 +303,7 @@ void go_to_current(TaskNode* tasks, TaskNode** current_pointer, int* remainingTi
 
 void free_tasks(TaskNode* tasks)
 {
-    printf("Freeing tasks\n");
+    //printf("Freeing tasks\n");
     TaskNode* tmp;
     while (tasks != NULL)
     {

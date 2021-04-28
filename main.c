@@ -17,24 +17,24 @@ int main(int argc, char* argv)
     int pid = getpid();
     int status;
     int childPid;
-    printf("Pid: %d\n", pid);
+    //printf("Pid: %d\n", pid);
     TaskNode* tasks = get_tasks("input.txt");
     TaskNode* current;
     int remainingTime;
 
     merge_sort(&tasks);
 
-    print_tasks(tasks);
+    //print_tasks(tasks);
     current = tasks;
 
     while(current != NULL)
     {
-        printf("\n");
+        //printf("\n");
         go_to_current(tasks, &current, &remainingTime);
 
         while(remainingTime > 0)
         {
-            printf("Sleeping for %d seconds\n", remainingTime);
+            //printf("Sleeping for %d seconds\n", remainingTime);
             fflush(stdout);
             sleep(remainingTime);
 
