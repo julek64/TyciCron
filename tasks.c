@@ -259,7 +259,7 @@ int run_task(struct Task task)
                 write_to_file(task); //save output to outfile
                 if(status == -1)
                     perror("execvp");
-                exit(1);
+                exit(status);
             }
             else
             {
