@@ -63,7 +63,7 @@ void sig_usr1(TaskNode** tasks_pointer, char* path, TaskNode** current_pointer, 
         free_tasks(*tasks_pointer);
     *tasks_pointer = get_tasks(path);
     merge_sort(tasks_pointer);
-    print_tasks(*tasks_pointer);
+    //print_tasks(*tasks_pointer);
     *current_pointer = *tasks_pointer;
     go_to_current(*tasks_pointer, current_pointer, remainingTime);
     USR1Status = 0;
