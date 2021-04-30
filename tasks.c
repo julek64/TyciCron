@@ -326,18 +326,26 @@ void free_tasks(TaskNode* tasks)
     {
         tmp = tasks;
         tasks = tasks->next;
-        free(tmp->task->time);
         CommandNode* command = tmp->task->commands;
         while(command != NULL)
         {
             CommandNode* tmpCommand = command;
             command = tmpCommand->next;
-            free(tmpCommand->command->program);
+            int i = 0;
+            char* currentArg = tmpCommand->command->args[i];
+            while(currentArg != NULL)
+            {
+                free(currentArg);
+                i++;
+                currentArg = tmpCommand->command->args[i];
+            }
             free(tmpCommand->command->args);
+            free(tmpCommand->command->program);
             free(tmpCommand->command);
+            free(tmpCommand);
         }
-        free(tmp->task->commands);
         free(tmp->task->strCommand);
+        free(tmp->task->time);
         free(tmp->task);
         free(tmp);
     }
